@@ -18,7 +18,11 @@ def main() -> None:
         subprocess.run([sys.executable, str(Path(__file__).with_name("main.py"))],
                        check=True, env=env)
         output = output_dir / "entry.txt"
-        text = output.read_text(encoding="utf-8")
+        raw = output.read_bytes()
+        expected_bytes = (EXPECTED + "\n").encode("utf-8")
+        assert raw == expected_bytes, "output bytes must exactly match the UTF-8 roast and newline"
+        assert len(raw) == len(expected_bytes), "output byte size must match the expected UTF-8 payload"
+        text = raw.decode("utf-8")
         line = text.removesuffix("\n")
         assert text.endswith("\n"), "output must end with exactly a newline"
         assert "\n" not in line and "\r" not in line, "output must be one line"
